@@ -1,1 +1,4 @@
-alert('ueue');
+import caricaPagina from "./manipolazioneDOM";
+
+caricaPagina();
+
