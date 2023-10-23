@@ -2,32 +2,6 @@ import progetto from "./Progetto";
 import storage from "./Storage";
 
 const caricaPagina = (() => {
-    let progetti = storage.loadDataFromLocalStorage();
-    if (progetti[0] && progetti[0].nome == "Inbox") {
-        // Inserire codice per caricare nel DOM i progetti presenti
-    } else {
-        progetti = [progetto.creaProgetto('Inbox')];
-    }
-
-    function inserisciProgettoDOM (submit_progetto) {
-        const contenuto_modale = document.querySelector('.modal-content');
-        const box = document.createElement("div");
-        box.textContent = submit_progetto;
-        box.classList.add('modal-item');
-        box.setAttribute('id', progetti.length - 1);
-        //const nome = document.createElement('span')
-        //nome.textContent= submit_progetto;
-        //box.appendChild(nome);
-
-        const eliminaProgettoBtn = document.createElement('button');
-        eliminaProgettoBtn.addEventListener('click', () => {
-            box.remove();
-        })
-        box.appendChild(eliminaProgettoBtn);
-        contenuto_modale.appendChild(box);
-
-    } 
-
 
     const body = document.body;
 
@@ -217,6 +191,9 @@ const caricaPagina = (() => {
         margin-bottom: 10px;
         cursor: pointer;
         transition: background-color 0.3s ease;
+        display: flex;
+        JUSTIFY-CONTENT: space-between;
+        align-items: center;
     }
     
     .modal-item:hover {
@@ -230,6 +207,32 @@ const caricaPagina = (() => {
      .menu-aperto {
         background-image:url(../src/media/menu-open.svg);
     }
+
+    .pulsanti {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        border: none;
+        background-image:url(../src/media/delete.svg);
+        cursor:pointer;
+    }
+
+    .inbox {
+        background-image:url(../src/media/inbox.svg);
+    }
+
+    .today {
+        background-image:url(../src/media/today.svg);
+    }
+
+    .week {
+        background-image:url(../src/media/week.svg);
+    }
+
+    .add {
+        background-image:url(../src/media/plus-circle.svg);
+    }
+
     </style>
 
     <nav>
@@ -244,11 +247,19 @@ const caricaPagina = (() => {
 
         <div id="modalContainer" class="modal-container">
             <div class="modal-content">
-                <div class="modal-item" id='0'>inBox</div>
-                <div class="modal-item">Today</div>
-                <div class="modal-item">This Week</div>
+                <div class="modal-item" id='0'>inBox
+                    <button class="pulsanti inbox"></button>
+                </div>
+                <div class="modal-item">Today
+                    <button class="pulsanti today"></button>
+                </div>
+                <div class="modal-item">This Week
+                    <button class="pulsanti week"></button>
+                </div>
                 <h2>Projects</h2>
-                <div class="modal-item" id="aggiungiProgetto">Add project</div>
+                <div class="modal-item" id="aggiungiProgetto">Add project
+                    <button class="pulsanti add"></button>
+                </div>
             </div>
         </div>
 
@@ -311,6 +322,55 @@ const caricaPagina = (() => {
 
     </div>
     `;
+
+    let progetti = storage.loadDataFromLocalStorage();
+    if (progetti[0] && progetti[0].nome == "Inbox") {
+        for( let i= 1; i <= progetti.length -1; i++) {
+            const contenuto_modale = document.querySelector('.modal-content');
+            const box = document.createElement("div");
+            box.textContent = progetti[i].nome;
+            box.classList.add('modal-item');
+            box.setAttribute('id', i);
+
+            const eliminaProgettoBtn = document.createElement('button');
+            eliminaProgettoBtn.classList.add('pulsanti');
+            eliminaProgettoBtn.addEventListener('click', () => {
+                progetto.eliminaProgetto(box.id,progetti);
+                storage.saveDataToLocalStorage(progetti);
+                box.remove();
+            })
+            box.appendChild(eliminaProgettoBtn);
+            contenuto_modale.appendChild(box);
+        }
+        // Inserire codice per caricare nel DOM i progetti presenti
+    } else {
+        progetti = [progetto.creaProgetto('Inbox')];
+    }
+
+    function inserisciProgettoDOM (submit_progetto) {
+        const contenuto_modale = document.querySelector('.modal-content');
+        const box = document.createElement("div");
+        box.textContent = submit_progetto;
+        box.classList.add('modal-item');
+        box.setAttribute('id', progetti.length - 1);
+
+
+        const eliminaProgettoBtn = document.createElement('button');
+        eliminaProgettoBtn.classList.add('pulsanti');
+        eliminaProgettoBtn.addEventListener('click', () => {
+            progetto.eliminaProgetto(box.id,progetti);
+            storage.saveDataToLocalStorage(progetti);
+            box.remove();
+        })
+        box.appendChild(eliminaProgettoBtn);
+        contenuto_modale.appendChild(box);
+
+    } 
+
+
+
+
+
 
     const openModalBtn = document.querySelector('.menu');
     const modalContainer = document.getElementById('modalContainer');

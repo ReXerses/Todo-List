@@ -12,6 +12,7 @@ const progetto = (() => {
         if (indice != 0) {
             progetti.splice(indice, 1);
         }
+        console.log(progetti)
         return progetti;
     };
 
