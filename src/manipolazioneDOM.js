@@ -1,4 +1,5 @@
 import progetto from "./Progetto";
+import todo from "./Todo";
 import storage from "./Storage";
 
 const caricaPagina = (() => {
@@ -168,7 +169,7 @@ const caricaPagina = (() => {
     .modal-container {
         position: fixed;
         left: -300px;
-        min-width: 300px;
+        min-width: 16rem;
         height: 100%;
         background-color: rgba(0, 0, 0, 0.8);
         overflow-y: auto;
@@ -233,6 +234,16 @@ const caricaPagina = (() => {
         background-image:url(../src/media/plus-circle.svg);
     }
 
+    .todoBox {
+        display: flex;
+        width: 65%;
+        justify-content: space-between;
+        border: solid black 2px;
+        padding: 0.6rem;
+        align-items: center;
+        border-radius: 16px;
+    }
+
     </style>
 
     <nav>
@@ -263,7 +274,7 @@ const caricaPagina = (() => {
             </div>
         </div>
 
-        <p class="nomeProgetto">In Box</p>
+        <p class="nomeProgetto"></p>
         <div class="aggiungiTask">
             <img src="../src/media/plus.svg" alt="icona aggiungi task" height="30px" width="30px">
             <span>Add Task</span>
@@ -324,7 +335,25 @@ const caricaPagina = (() => {
     `;
 
     let progetti = storage.loadDataFromLocalStorage();
+    let progettoAttuale=0;
+
+    const inboxBox = document.getElementById('0');              //Verra sistemata
+    inboxBox.addEventListener('click' , () => {
+        nomeProgetto.textContent=progetti[inboxBox.id].nome;
+        progettoAttuale = 0;
+
+        //if(progetti[0].todos[0]){
+            caricaTodoDom(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length-1);
+        //}
+
+        console.log('si ci sono')
+    })
+
+    const nomeProgetto = document.querySelector('.nomeProgetto');
+
+    nomeProgetto.textContent=progetti[progettoAttuale].nome;
     if (progetti[0] && progetti[0].nome == "Inbox") {
+
         for( let i= 1; i <= progetti.length -1; i++) {
             const contenuto_modale = document.querySelector('.modal-content');
             const box = document.createElement("div");
@@ -338,9 +367,25 @@ const caricaPagina = (() => {
                 progetto.eliminaProgetto(box.id,progetti);
                 storage.saveDataToLocalStorage(progetti);
                 box.remove();
+                progettoAttuale=0;
+                nomeProgetto.textContent=progetti[0].nome;
+
             })
             box.appendChild(eliminaProgettoBtn);
             contenuto_modale.appendChild(box);
+            box.addEventListener('click' , () => {
+                nomeProgetto.textContent=progetti[box.id].nome;
+                progettoAttuale= box.id;
+                console.log(progettoAttuale);
+                if(progetti[progettoAttuale].todos[0]) {
+                    caricaTodoDom(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length-1);
+                }
+
+                console.log('si ci sono')
+
+                //DA TRASFORMARE IN FUNZIONE
+                //Carica tutti i todo del progetto
+            })
         }
         // Inserire codice per caricare nel DOM i progetti presenti
     } else {
@@ -361,15 +406,87 @@ const caricaPagina = (() => {
             progetto.eliminaProgetto(box.id,progetti);
             storage.saveDataToLocalStorage(progetti);
             box.remove();
+            progettoAttuale=0;
+            nomeProgetto.textContent=progetti[0].nome;
         })
+
+      
         box.appendChild(eliminaProgettoBtn);
         contenuto_modale.appendChild(box);
 
-    } 
+        box.addEventListener('click' , () => {
+            nomeProgetto.textContent=progetti[box.id].nome;
+            progettoAttuale= box.id;
+            if(progetti[progettoAttuale].todos[0]) {
+                caricaTodoDom(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length-1);
+            }
+            console.log(progettoAttuale);
+            console.log('si ci sono vediamo')
+        })
+
+    }
+
+    function inserisciTodoDOM (progetti, id) {
+        const mainContainer = document.querySelector('.main');
+        const todoBox = document.createElement('div');
+
+        const checkBtn = document.createElement('button');
+        checkBtn.classList.add('pulsanti');
+
+        //event listener per cambiare il valore IsDone e di conseguenza sbarrare l'intero todoBox
+        checkBtn.addEventListener('click', () => {
+            if(progetti[id].isDone) {
+                progetti[id].isDone = false;
+                storage.saveDataToLocalStorage(progetti);
+                //togliere la riga sull intero box
+            } else {
+                progetti[id].isDone = true;
+                storage.saveDataToLocalStorage(progetti);
+                //mette la riga sull intero box
+            }
+
+            
+
+        })
+
+        todoBox.appendChild(checkBtn);
+
+        const titoloSpan = document.createElement('span');
+        titoloSpan.textContent = progetti[id].titolo;
+        todoBox.appendChild(titoloSpan);
+
+
+        const dataSpan = document.createElement('span');
+        dataSpan.textContent = progetti[id].data;
+        todoBox.appendChild(dataSpan);
+
+
+        const prioritàSpan = document.createElement('span');
+        prioritàSpan.textContent = progetti[id].priority;
+        todoBox.appendChild(prioritàSpan);
+        todoBox.classList.add('todoBox');
+
+        mainContainer.appendChild(todoBox);
+
+    }
+
+    function caricaTodoDom (progetti, lunghezza) {
+        removeAllTodoBoxDom();
+        for(let i=0; i<=lunghezza; i++) {
+            inserisciTodoDOM(progetti, i);
+        }
+    }
+
+    function removeAllTodoBoxDom () {
+        const todoBoxes = document.querySelectorAll('.todoBox');
+        todoBoxes.forEach(todoBox => {
+            todoBox.remove();
+        });
+    }
 
 
 
-
+   // Listeners
 
 
     const openModalBtn = document.querySelector('.menu');
@@ -421,13 +538,37 @@ const caricaPagina = (() => {
         modale_addProject.reset();
         modale_addProject.style.display = "none";
 
-        console.log(progetti);
+        //console.log(progetti);
         inserisciProgettoDOM(submit_progetto);
 
     })
 
-    console.log(progetti);
+    modale_addTask.addEventListener('submit' , (e) => {
+        e.preventDefault();
 
+        const titolo = document.getElementById('titolo').value;
+        const descrizione = document.getElementById('descrizione').value;
+        const priorità = document.getElementById('priorità').value;
+        const data = document.getElementById('data').value;
+
+        todo.aggiungiToProgetto(progetti[progettoAttuale], titolo, descrizione, priorità, data);
+
+        storage.saveDataToLocalStorage(progetti);
+        modale_addTask.reset();
+        modale_addTask.style.display = "none";
+
+        console.log(progetti);
+
+        inserisciTodoDOM(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length -1);
+
+
+    })
+
+    
+
+    console.log(progetti);
+    //console.log(progetti[3].todos[0].titolo);
+    //console.log(progetti[3].todos.length-1);
 
 
 });
