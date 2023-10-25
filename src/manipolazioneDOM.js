@@ -243,13 +243,58 @@ const caricaPagina = (() => {
 
     .todoBox {
         display: flex;
-        width: 65%;
+        width: clamp(280px, 60%, 1000px);
         justify-content: space-between;
         border: solid black 2px;
         padding: 0.6rem;
         align-items: center;
         border-radius: 16px;
+        position: relative;
+        gap: 1rem;
+        font-size: clamp(16px, 5vw, 24px);
+        cursor: pointer;
     }
+
+    .firstHalf {
+        align-items: center;
+        display: flex;
+        gap: 1rem;
+        flex: 1;
+    }
+
+    .secondHalf {
+        align-items: center;
+        display: flex;
+        flex: 1;
+        justify-content: space-around;
+    }
+
+    .linea {
+        position: absolute;
+        left: 60px;
+        border: 2px solid black;
+        width: calc(100% - 140px);
+        padding-left: 30px;
+    }
+
+    .descrizione {
+        display: flex;
+        flex-direction: column;
+        width: clamp(280px, 60%, 1000px);
+        padding: 0.6rem;
+        border: solid 2px black;
+        border-radius: 16px;
+        text-align: center;
+        font-size: clamp(16px, 5vw, 24px);
+        position: fixed;
+        background-color: aqua;
+        top: 50%;
+        left: 50%;
+        overflow-y: auto;
+        transition: opacity 0.3s ease;
+        transform: translate(-50%, -50%);
+    }
+
 
     </style>
 
@@ -349,9 +394,7 @@ const caricaPagina = (() => {
         nomeProgetto.textContent=progetti[inboxBox.id].nome;
         progettoAttuale = 0;
 
-        //if(progetti[0].todos[0]){
             caricaTodoDom(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length-1);
-        //}
 
         console.log('si ci sono')
     })
@@ -391,11 +434,7 @@ const caricaPagina = (() => {
                     } else {
                         removeAllTodoBoxDom();// controllo
                     }
-                    /*nomeProgetto.textContent=progetti[box.id].nome;
-                    progettoAttuale= box.id;
-                    if(progetti[progettoAttuale].todos[0]) {
-                        caricaTodoDom(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length-1);
-                    }*/
+
                 }
 
                 console.log('si ci sono')
@@ -454,41 +493,68 @@ const caricaPagina = (() => {
         const mainContainer = document.querySelector('.main');
         const todoBox = document.createElement('div');
 
+        const linea =document.createElement('div');
+        linea.classList.add('linea');
+
+        const firstHalf = document.createElement('div');
+        firstHalf.classList.add('firstHalf');
+
+        const secondHalf = document.createElement('div');
+        secondHalf.classList.add('secondHalf');
+
         const checkBtn = document.createElement('button');
         checkBtn.classList.add('pulsanti');
         checkBtn.classList.add('checkbox');
+
+        const descrizioneBox =document.createElement('div')
+        descrizioneBox.classList.add("descrizione");
+        const descrizioneSpan = document.createElement('p'); //cambiare nome
+        descrizioneSpan.textContent = progetti[id].descrizione;
+        //descrizioneSpan.classList.add("descrizione");
+
+        const chiudiDescrizioneBtn = document.createElement('button');
+        chiudiDescrizioneBtn.addEventListener('click' , () => {
+            descrizioneBox.remove();
+        })
 
         //event listener per cambiare il valore IsDone e di conseguenza sbarrare l'intero todoBox
         checkBtn.addEventListener('click', () => {
             if(progetti[id].isDone) {
                 progetti[id].isDone = false;
                 storage.saveDataToLocalStorage(progetti);
+                linea.remove();
                 //togliere la riga sull intero box
             } else {
                 progetti[id].isDone = true;
                 storage.saveDataToLocalStorage(progetti);
+                todoBox.appendChild(linea);
                 //mette la riga sull intero box
             }
 
             
 
         })
-
-        todoBox.appendChild(checkBtn);
+        firstHalf.appendChild(checkBtn);
+        firstHalf.classList.add('firstHalf');
+        //todoBox.appendChild(checkBtn);
 
         const titoloSpan = document.createElement('span');
         titoloSpan.textContent = progetti[id].titolo;
-        todoBox.appendChild(titoloSpan);
-
+        firstHalf.appendChild(titoloSpan);
+        //todoBox.appendChild(titoloSpan);
+        todoBox.appendChild(firstHalf);
 
         const dataSpan = document.createElement('span');
         dataSpan.textContent = progetti[id].data;
-        todoBox.appendChild(dataSpan);
+        secondHalf.appendChild(dataSpan);
+        //todoBox.appendChild(dataSpan);
 
 
         const prioritàSpan = document.createElement('span');
         prioritàSpan.textContent = progetti[id].priority;
-        todoBox.appendChild(prioritàSpan);
+        secondHalf.appendChild(prioritàSpan);
+        //todoBox.appendChild(prioritàSpan);
+
         todoBox.classList.add('todoBox');
 
         const cancellaTodoBtn = document.createElement('button');
@@ -500,8 +566,19 @@ const caricaPagina = (() => {
             storage.saveDataToLocalStorage(progetti);
             todoBox.remove();
         })
+        //secondHalf.appendChild(cancellaTodoBtn);
 
+        //todoBox.appendChild(cancellaTodoBtn);
+        todoBox.appendChild(secondHalf);
         todoBox.appendChild(cancellaTodoBtn);
+
+        todoBox.addEventListener('click', (e) => {
+            if (e.target !== checkBtn && e.target !== cancellaTodoBtn ) {
+                descrizioneBox.appendChild(descrizioneSpan)
+                descrizioneBox.appendChild(chiudiDescrizioneBtn);
+                mainContainer.appendChild(descrizioneBox);
+            }
+        })
 
         mainContainer.appendChild(todoBox);
 
