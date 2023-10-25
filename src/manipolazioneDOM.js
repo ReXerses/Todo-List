@@ -209,13 +209,16 @@ const caricaPagina = (() => {
         background-image:url(../src/media/menu-open.svg);
     }
 
-    .pulsanti {
+    .pulsanti, .checkbox {
         width: 30px;
         height: 30px;
         border-radius: 8px;
         border: none;
-        background-image:url(../src/media/delete.svg);
         cursor:pointer;
+    }
+
+    .checkbox {
+        border: 2px solid black;
     }
 
     .inbox {
@@ -232,6 +235,10 @@ const caricaPagina = (() => {
 
     .add {
         background-image:url(../src/media/plus-circle.svg);
+    }
+
+    .trash {
+        background-image:url(../src/media/delete.svg);
     }
 
     .todoBox {
@@ -363,22 +370,32 @@ const caricaPagina = (() => {
 
             const eliminaProgettoBtn = document.createElement('button');
             eliminaProgettoBtn.classList.add('pulsanti');
+            eliminaProgettoBtn.classList.add('trash');
             eliminaProgettoBtn.addEventListener('click', () => {
                 progetto.eliminaProgetto(box.id,progetti);
                 storage.saveDataToLocalStorage(progetti);
                 box.remove();
+                removeAllTodoBoxDom();
                 progettoAttuale=0;
                 nomeProgetto.textContent=progetti[0].nome;
-
             })
             box.appendChild(eliminaProgettoBtn);
             contenuto_modale.appendChild(box);
-            box.addEventListener('click' , () => {
-                nomeProgetto.textContent=progetti[box.id].nome;
-                progettoAttuale= box.id;
-                console.log(progettoAttuale);
-                if(progetti[progettoAttuale].todos[0]) {
-                    caricaTodoDom(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length-1);
+            box.addEventListener('click' , (e) => {
+                if(e.target !== eliminaProgettoBtn) {
+                    nomeProgetto.textContent=progetti[box.id].nome;
+                    progettoAttuale= box.id;
+
+                    if(progetti[progettoAttuale].todos[0]) {
+                        caricaTodoDom(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length-1);
+                    } else {
+                        removeAllTodoBoxDom();// controllo
+                    }
+                    /*nomeProgetto.textContent=progetti[box.id].nome;
+                    progettoAttuale= box.id;
+                    if(progetti[progettoAttuale].todos[0]) {
+                        caricaTodoDom(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length-1);
+                    }*/
                 }
 
                 console.log('si ci sono')
@@ -402,10 +419,12 @@ const caricaPagina = (() => {
 
         const eliminaProgettoBtn = document.createElement('button');
         eliminaProgettoBtn.classList.add('pulsanti');
+        eliminaProgettoBtn.classList.add('trash');
         eliminaProgettoBtn.addEventListener('click', () => {
             progetto.eliminaProgetto(box.id,progetti);
             storage.saveDataToLocalStorage(progetti);
             box.remove();
+            removeAllTodoBoxDom();
             progettoAttuale=0;
             nomeProgetto.textContent=progetti[0].nome;
         })
@@ -414,11 +433,16 @@ const caricaPagina = (() => {
         box.appendChild(eliminaProgettoBtn);
         contenuto_modale.appendChild(box);
 
-        box.addEventListener('click' , () => {
-            nomeProgetto.textContent=progetti[box.id].nome;
-            progettoAttuale= box.id;
-            if(progetti[progettoAttuale].todos[0]) {
-                caricaTodoDom(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length-1);
+        box.addEventListener('click' , (e) => {
+            if(e.target !== eliminaProgettoBtn) {
+                nomeProgetto.textContent=progetti[box.id].nome;
+                progettoAttuale= box.id;
+
+                if(progetti[progettoAttuale].todos[0]) {
+                    caricaTodoDom(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length-1);
+                } else {
+                    removeAllTodoBoxDom();// controllo
+                }
             }
             console.log(progettoAttuale);
             console.log('si ci sono vediamo')
@@ -432,6 +456,7 @@ const caricaPagina = (() => {
 
         const checkBtn = document.createElement('button');
         checkBtn.classList.add('pulsanti');
+        checkBtn.classList.add('checkbox');
 
         //event listener per cambiare il valore IsDone e di conseguenza sbarrare l'intero todoBox
         checkBtn.addEventListener('click', () => {
@@ -465,6 +490,18 @@ const caricaPagina = (() => {
         prioritàSpan.textContent = progetti[id].priority;
         todoBox.appendChild(prioritàSpan);
         todoBox.classList.add('todoBox');
+
+        const cancellaTodoBtn = document.createElement('button');
+        cancellaTodoBtn.classList.add('pulsanti');
+        cancellaTodoBtn.classList.add('trash');
+
+        cancellaTodoBtn.addEventListener('click', () => {
+            todo.rimuoviTodo(progetti,id);
+            storage.saveDataToLocalStorage(progetti);
+            todoBox.remove();
+        })
+
+        todoBox.appendChild(cancellaTodoBtn);
 
         mainContainer.appendChild(todoBox);
 

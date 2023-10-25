@@ -15,9 +15,9 @@ const todo = (() => {
         progetto.todos.push(todo);
     }
 
-    function rimuoviTodo(indice) {
-        const progettoCorrente = getProgettoCorrente();
-        progettoCorrente.todos.splice(indice, 1);
+    function rimuoviTodo(progetto, indice) {
+        //const progettoCorrente = getProgettoCorrente();
+        progetto.splice(indice, 1);
         //mostraTodos(progettoCorrente); una funzione che mostri i todos attivi?
     }
     
@@ -28,7 +28,6 @@ const todo = (() => {
     }
 
     return {
-        creaTodo,
         aggiungiToProgetto,
         rimuoviTodo
     };
