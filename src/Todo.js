@@ -15,17 +15,16 @@ const todo = (() => {
         progetto.todos.push(todo);
     }
 
+    function aggiungiATodoGenerali (listaTodo, titolo, descrizione, priority, data) {
+        const todo = creaTodo(titolo, descrizione, priority, data);
+        listaTodo.push(todo);
+    }
+
     function rimuoviTodo(progetto, indice) {
-        //const progettoCorrente = getProgettoCorrente();
         progetto.splice(indice, 1);
         //mostraTodos(progettoCorrente); una funzione che mostri i todos attivi?
     }
     
-    // Funzione per ottenere il progetto corrente (In questo esempio, è Inbox) 
-    //da cambiare in modo da considerare anche gli altri progetti
-    function getProgettoCorrente() {
-        return progetto[0];
-    }
 
     return {
         aggiungiToProgetto,

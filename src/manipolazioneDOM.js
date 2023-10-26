@@ -1,6 +1,7 @@
 import progetto from "./Progetto";
 import todo from "./Todo";
 import storage from "./Storage";
+import { parse, isToday, isWithinInterval, startOfWeek, endOfWeek } from 'date-fns';
 
 const caricaPagina = (() => {
 
@@ -313,10 +314,10 @@ const caricaPagina = (() => {
                 <div class="modal-item" id='0'>inBox
                     <button class="pulsanti inbox"></button>
                 </div>
-                <div class="modal-item">Today
+                <div class="modal-item" id='oggi'>Today
                     <button class="pulsanti today"></button>
                 </div>
-                <div class="modal-item">This Week
+                <div class="modal-item" id='settimana'>This Week
                     <button class="pulsanti week"></button>
                 </div>
                 <h2>Projects</h2>
@@ -327,10 +328,7 @@ const caricaPagina = (() => {
         </div>
 
         <p class="nomeProgetto"></p>
-        <div class="aggiungiTask">
-            <img src="../src/media/plus.svg" alt="icona aggiungi task" height="30px" width="30px">
-            <span>Add Task</span>
-        </div>
+        <button class="aggiungiTask">Create Task</button>
 
         <form class="add-task" action="#" method="get">
             <p class="action">Add todo</p>
@@ -385,12 +383,51 @@ const caricaPagina = (() => {
 
     </div>
     `;
+    function inserisciProgettoDOM(submit_progetto, id) {
+        const contenuto_modale = document.querySelector('.modal-content');
+        const box = document.createElement('div');
+        box.textContent = submit_progetto;
+        box.classList.add('modal-item');
+        box.setAttribute('id', id); // Utilizza l'ID specificato
+      
+        const eliminaProgettoBtn = document.createElement('button');
+        eliminaProgettoBtn.classList.add('pulsanti');
+        eliminaProgettoBtn.classList.add('trash');
+        eliminaProgettoBtn.addEventListener('click', () => {
+          progetto.eliminaProgetto(box.id, progetti);
+          storage.saveDataToLocalStorage(progetti);
+          box.remove();
+          removeAllTodoBoxDom();
+          progettoAttuale = 0;
+          nomeProgetto.textContent = progetti[0].nome;
+        })
+      
+        box.appendChild(eliminaProgettoBtn);
+        contenuto_modale.appendChild(box);
+      
+        box.addEventListener('click', (e) => {
+          addTask.disabled = false;
+          if (e.target !== eliminaProgettoBtn) {
+            nomeProgetto.textContent = progetti[box.id].nome;
+            progettoAttuale = box.id;
+      
+            if (progetti[progettoAttuale].todos[0]) {
+              caricaTodoDom(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length - 1);
+            } else {
+              removeAllTodoBoxDom(); // controllo
+            }
+          }
 
+        })
+      }
+
+    const nomeProgetto = document.querySelector('.nomeProgetto');
     let progetti = storage.loadDataFromLocalStorage();
     let progettoAttuale=0;
 
     const inboxBox = document.getElementById('0');              //Verra sistemata
     inboxBox.addEventListener('click' , () => {
+        addTask.disabled = false;
         nomeProgetto.textContent=progetti[inboxBox.id].nome;
         progettoAttuale = 0;
 
@@ -399,13 +436,12 @@ const caricaPagina = (() => {
         console.log('si ci sono')
     })
 
-    const nomeProgetto = document.querySelector('.nomeProgetto');
-
-    nomeProgetto.textContent=progetti[progettoAttuale].nome;
+    nomeProgetto.textContent='Inbox';
     if (progetti[0] && progetti[0].nome == "Inbox") {
 
         for( let i= 1; i <= progetti.length -1; i++) {
-            const contenuto_modale = document.querySelector('.modal-content');
+            inserisciProgettoDOM(progetti[i].nome, i);
+            /*const contenuto_modale = document.querySelector('.modal-content');
             const box = document.createElement("div");
             box.textContent = progetti[i].nome;
             box.classList.add('modal-item');
@@ -426,6 +462,7 @@ const caricaPagina = (() => {
             contenuto_modale.appendChild(box);
             box.addEventListener('click' , (e) => {
                 if(e.target !== eliminaProgettoBtn) {
+                    addTask.disabled = false;
                     nomeProgetto.textContent=progetti[box.id].nome;
                     progettoAttuale= box.id;
 
@@ -437,18 +474,13 @@ const caricaPagina = (() => {
 
                 }
 
-                console.log('si ci sono')
-
-                //DA TRASFORMARE IN FUNZIONE
-                //Carica tutti i todo del progetto
-            })
+            })*/
         }
-        // Inserire codice per caricare nel DOM i progetti presenti
     } else {
         progetti = [progetto.creaProgetto('Inbox')];
     }
 
-    function inserisciProgettoDOM (submit_progetto) {
+    /*function inserisciProgettoDOM (submit_progetto) {
         const contenuto_modale = document.querySelector('.modal-content');
         const box = document.createElement("div");
         box.textContent = submit_progetto;
@@ -473,6 +505,7 @@ const caricaPagina = (() => {
         contenuto_modale.appendChild(box);
 
         box.addEventListener('click' , (e) => {
+            addTask.disabled = false;
             if(e.target !== eliminaProgettoBtn) {
                 nomeProgetto.textContent=progetti[box.id].nome;
                 progettoAttuale= box.id;
@@ -487,9 +520,9 @@ const caricaPagina = (() => {
             console.log('si ci sono vediamo')
         })
 
-    }
+    }*/
 
-    function inserisciTodoDOM (progetti, id) {
+    function inserisciTodoDOM (progetto, id) {
         const mainContainer = document.querySelector('.main');
         const todoBox = document.createElement('div');
 
@@ -509,7 +542,7 @@ const caricaPagina = (() => {
         const descrizioneBox =document.createElement('div')
         descrizioneBox.classList.add("descrizione");
         const descrizioneSpan = document.createElement('p'); //cambiare nome
-        descrizioneSpan.textContent = progetti[id].descrizione;
+        descrizioneSpan.textContent = progetto[id].descrizione;
         //descrizioneSpan.classList.add("descrizione");
 
         const chiudiDescrizioneBtn = document.createElement('button');
@@ -519,13 +552,13 @@ const caricaPagina = (() => {
 
         //event listener per cambiare il valore IsDone e di conseguenza sbarrare l'intero todoBox
         checkBtn.addEventListener('click', () => {
-            if(progetti[id].isDone) {
-                progetti[id].isDone = false;
+            if(progetto[id].isDone) {
+                progetto[id].isDone = false;
                 storage.saveDataToLocalStorage(progetti);
                 linea.remove();
                 //togliere la riga sull intero box
             } else {
-                progetti[id].isDone = true;
+                progetto[id].isDone = true;
                 storage.saveDataToLocalStorage(progetti);
                 todoBox.appendChild(linea);
                 //mette la riga sull intero box
@@ -539,19 +572,19 @@ const caricaPagina = (() => {
         //todoBox.appendChild(checkBtn);
 
         const titoloSpan = document.createElement('span');
-        titoloSpan.textContent = progetti[id].titolo;
+        titoloSpan.textContent = progetto[id].titolo;
         firstHalf.appendChild(titoloSpan);
         //todoBox.appendChild(titoloSpan);
         todoBox.appendChild(firstHalf);
 
         const dataSpan = document.createElement('span');
-        dataSpan.textContent = progetti[id].data;
+        dataSpan.textContent = progetto[id].data;
         secondHalf.appendChild(dataSpan);
         //todoBox.appendChild(dataSpan);
 
 
         const prioritàSpan = document.createElement('span');
-        prioritàSpan.textContent = progetti[id].priority;
+        prioritàSpan.textContent = progetto[id].priority;
         secondHalf.appendChild(prioritàSpan);
         //todoBox.appendChild(prioritàSpan);
 
@@ -562,7 +595,7 @@ const caricaPagina = (() => {
         cancellaTodoBtn.classList.add('trash');
 
         cancellaTodoBtn.addEventListener('click', () => {
-            todo.rimuoviTodo(progetti,id);
+            todo.rimuoviTodo(progetto,id);
             storage.saveDataToLocalStorage(progetti);
             todoBox.remove();
         })
@@ -579,6 +612,10 @@ const caricaPagina = (() => {
                 mainContainer.appendChild(descrizioneBox);
             }
         })
+
+        if(progetto[id].isDone) {
+            todoBox.appendChild(linea);
+        }
 
         mainContainer.appendChild(todoBox);
 
@@ -599,9 +636,49 @@ const caricaPagina = (() => {
     }
 
 
+      function mostraTodoOggiDOM(progetti) {
+      
+        for (let id = 0; id < progetti.length; id++) {
+          for (let todoId = 0; todoId < progetti[id].todos.length; todoId++) {
+            const todo = progetti[id].todos[todoId];
+            const dataScadenza = parse(todo.data, 'yyyy-MM-dd', new Date());
+      
+            if (isToday(dataScadenza)) {
+              inserisciTodoDOM(progetti[id].todos, todoId);
+            }
+          }
+        }
+      }
+
+      function mostraTodoQuestaSettimanaDOM(progetti) {
+        const dataOggi = new Date();
+        const inizioSettimana = startOfWeek(dataOggi);
+        const fineSettimana = endOfWeek(dataOggi, { weekStartsOn: 1 });
+        
+
+      
+        for (let id = 0; id < progetti.length; id++) {
+          for (let todoId = 0; todoId < progetti[id].todos.length; todoId++) {
+            const todo = progetti[id].todos[todoId];
+            const dataScadenza = parse(todo.data, 'yyyy-MM-dd', new Date());
+            //console.log(isWithinInterval(dataScadenza, { start: inizioSettimana, end: fineSettimana }));
+
+            if (isWithinInterval(dataScadenza, { start: inizioSettimana, end: fineSettimana })) {
+              inserisciTodoDOM(progetti[id].todos, todoId);
+            }
+          }
+        }
+      }
+      
+      
+      
+      
+      
+      
+
+
 
    // Listeners
-
 
     const openModalBtn = document.querySelector('.menu');
     const modalContainer = document.getElementById('modalContainer');
@@ -611,18 +688,30 @@ const caricaPagina = (() => {
     const addProject = document.getElementById('aggiungiProgetto')
     const modale_addProject = document.querySelector('.add-project');
     const cancelProjectBtn = document.getElementById('cancel-project');
+    const oggi = document.getElementById('oggi');
+    const questaSettimana = document.getElementById('settimana');
 
     openModalBtn.addEventListener('click', () => {
+
         openModalBtn.classList.toggle('menu-aperto');
         modalContainer.classList.toggle('modal-open');
-
         
     });
 
-    addTask.addEventListener('click', () => {
+    
+    
+        addTask.addEventListener('click', () => {
+            //console.log(addTask.disabled == 'true');
+            if (addTask.disabled === false ) {
+                modale_addTask.style.display = "flex";
+            }
+        });
+    
+      
+    /*addTask.addEventListener('click', () => {
         modale_addTask.style.display = "flex";
         
-    })
+    })*/
 
     cancelTaskBtn.addEventListener('click', () => {
         modale_addTask.reset();
@@ -653,7 +742,7 @@ const caricaPagina = (() => {
         modale_addProject.style.display = "none";
 
         //console.log(progetti);
-        inserisciProgettoDOM(submit_progetto);
+        inserisciProgettoDOM(submit_progetto,progetti.length-1);
 
     })
 
@@ -670,7 +759,7 @@ const caricaPagina = (() => {
         storage.saveDataToLocalStorage(progetti);
         modale_addTask.reset();
         modale_addTask.style.display = "none";
-
+        console.log(e);
         console.log(progetti);
 
         inserisciTodoDOM(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length -1);
@@ -678,12 +767,25 @@ const caricaPagina = (() => {
 
     })
 
+    oggi.addEventListener('click' , () => {
+        addTask.disabled = true;
+        removeAllTodoBoxDom();
+        nomeProgetto.textContent = oggi.textContent;
+        mostraTodoOggiDOM(progetti);
+    })
+
+    questaSettimana.addEventListener('click' , () => {
+        addTask.disabled = true;
+        console.log(addTask.disabled);
+        removeAllTodoBoxDom();
+        nomeProgetto.textContent= questaSettimana.textContent;
+        mostraTodoQuestaSettimanaDOM(progetti);
+    })
+
     
 
     console.log(progetti);
-    //console.log(progetti[3].todos[0].titolo);
-    //console.log(progetti[3].todos.length-1);
-
+    
 
 });
 
