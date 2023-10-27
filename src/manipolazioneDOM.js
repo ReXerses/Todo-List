@@ -7,6 +7,17 @@ import { parse, isToday, isWithinInterval, startOfWeek, endOfWeek } from 'date-f
 const caricaPagina = (() => {
     strutturaPagina();
 
+    const dataInput = document.getElementById('data');
+
+    // Ottieni la data odierna
+    const dataOdierna = new Date();
+
+    // Formatta la data odierna nel formato "YYYY-MM-DD"
+    const dataFormattata = dataOdierna.toISOString().split('T')[0];
+
+    // Imposta il valore minimo nell'input data
+    dataInput.min = dataFormattata;
+
     const openModalBtn = document.querySelector('.menu');
     const modalContainer = document.getElementById('modalContainer');
     const addTask = document.querySelector('.aggiungiTask');
@@ -19,6 +30,7 @@ const caricaPagina = (() => {
     const questaSettimana = document.getElementById('settimana');
     const nomeProgetto = document.querySelector('.nomeProgetto');
     const inboxBox = document.getElementById('0');
+    const overlay = document.getElementById('modalOverlay');
     let progetti = storage.loadDataFromLocalStorage();
     let progettoAttuale=0;
     
@@ -80,11 +92,12 @@ const caricaPagina = (() => {
 
         const descrizioneBox =document.createElement('div')
         descrizioneBox.classList.add("descrizione");
-        const descrizioneP = document.createElement('p'); //cambiare nome
+        const descrizioneP = document.createElement('p'); 
         descrizioneP.textContent = progetto[id].descrizione;
 
         const chiudiDescrizioneBtn = document.createElement('button');
         chiudiDescrizioneBtn.addEventListener('click' , () => {
+            overlay.classList.toggle('modal-overlay');
             descrizioneBox.remove();
         })
 
@@ -92,11 +105,13 @@ const caricaPagina = (() => {
         checkBtn.addEventListener('click', () => {
             if(progetto[id].isDone) {
                 progetto[id].isDone = false;
+                checkBtn.style.backgroundImage= 'none';
                 storage.saveDataToLocalStorage(progetti);
                 linea.remove();
                 //toglie la riga sull intero box
             } else {
                 progetto[id].isDone = true;
+                checkBtn.style.backgroundImage= 'url(../src/media/check.svg)';
                 storage.saveDataToLocalStorage(progetti);
                 todoBox.appendChild(linea);
                 //mette la riga sull intero box
@@ -137,13 +152,17 @@ const caricaPagina = (() => {
 
         todoBox.addEventListener('click', (e) => {
             if (e.target !== checkBtn && e.target !== cancellaTodoBtn ) {
-                descrizioneBox.appendChild(descrizioneP)
+                overlay.classList.toggle('modal-overlay');
+                descrizioneBox.appendChild(descrizioneP);
+                chiudiDescrizioneBtn.textContent = 'Close';
+                chiudiDescrizioneBtn.classList.add('aggiungiTask');
                 descrizioneBox.appendChild(chiudiDescrizioneBtn);
                 mainContainer.appendChild(descrizioneBox);
             }
         })
 
         if(progetto[id].isDone) {
+            checkBtn.style.backgroundImage= 'url(../src/media/check.svg)';
             todoBox.appendChild(linea);
         }
 
@@ -208,7 +227,7 @@ const caricaPagina = (() => {
     } else {
         progetti = [progetto.creaProgetto('Inbox')];
     }
-      
+
 
    // Event Listeners
 
@@ -219,6 +238,7 @@ const caricaPagina = (() => {
 
         caricaTodoDom(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length-1);
     })
+    inboxBox.click();
 
     openModalBtn.addEventListener('click', () => {
         openModalBtn.classList.toggle('menu-aperto');
@@ -227,55 +247,66 @@ const caricaPagina = (() => {
 
     addTask.addEventListener('click', () => {
         if (addTask.disabled === false ) {
+                overlay.classList.toggle('modal-overlay');
                 modale_addTask.style.display = "flex";
         }
     });
     
-    cancelTaskBtn.addEventListener('click', () => {
+    cancelTaskBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        overlay.classList.toggle('modal-overlay');
         modale_addTask.reset();
         modale_addTask.style.display = "none";
     })
 
     addProject.addEventListener('click', () => {
+        overlay.classList.toggle('modal-overlay');
         modale_addProject.style.display = "flex";
     })
     
-    cancelProjectBtn.addEventListener('click', () => {
+    cancelProjectBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        overlay.classList.toggle('modal-overlay');
         modale_addProject.reset();
         modale_addProject.style.display = "none";
     })
 
     modale_addProject.addEventListener('submit', (e) => {
         e.preventDefault();
-
+        
         const submit_progetto = document.getElementById('nome-progetto').value;
-        const nuovo_progetto = progetto.creaProgetto(submit_progetto);
-
-        progetti.push(nuovo_progetto);
-
-        storage.saveDataToLocalStorage(progetti);
-        modale_addProject.reset();
-        modale_addProject.style.display = "none";
-
-        inserisciProgettoDOM(submit_progetto,progetti.length-1);
+        if (submit_progetto) {
+            overlay.classList.toggle('modal-overlay');
+            const nuovo_progetto = progetto.creaProgetto(submit_progetto);
+            progetti.push(nuovo_progetto);
+            storage.saveDataToLocalStorage(progetti);
+            modale_addProject.reset();
+            modale_addProject.style.display = "none";
+            inserisciProgettoDOM(submit_progetto,progetti.length-1);
+        } else {
+            alert('Inserisci un nome al progetto');
+        }
 
     })
 
     modale_addTask.addEventListener('submit' , (e) => {
         e.preventDefault();
-
         const titolo = document.getElementById('titolo').value;
         const descrizione = document.getElementById('descrizione').value;
         const priorità = document.getElementById('priorità').value;
         const data = document.getElementById('data').value;
+        if (titolo && descrizione && priorità && data){
+            overlay.classList.toggle('modal-overlay');
+            todo.aggiungiToProgetto(progetti[progettoAttuale], titolo, descrizione, priorità, data);
 
-        todo.aggiungiToProgetto(progetti[progettoAttuale], titolo, descrizione, priorità, data);
+            storage.saveDataToLocalStorage(progetti);
+            modale_addTask.reset();
+            modale_addTask.style.display = "none";
 
-        storage.saveDataToLocalStorage(progetti);
-        modale_addTask.reset();
-        modale_addTask.style.display = "none";
-
-        inserisciTodoDOM(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length -1);
+            inserisciTodoDOM(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length -1);
+        } else {
+            alert('Inserire tutti i campi');
+        }
 
     })
 

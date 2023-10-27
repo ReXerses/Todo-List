@@ -2,6 +2,7 @@ const strutturaPagina = (() => {
     const body = document.body;
 
     body.innerHTML = `<style>
+    @import url('https://fonts.googleapis.com/css2?family=Gentium+Book+Plus:ital@1&family=Lobster&display=swap');
 
     body {
         min-height: 100vh;
@@ -10,13 +11,19 @@ const strutturaPagina = (() => {
         flex-flow: column wrap;
         justify-content: space-between;
         margin: 0px;
+        font-family: 'Lobster', sans-serif;
+        letter-spacing: 4px;
     }
     
     nav {
         display: flex;
-        padding: 1rem;
-        column-gap: 5rem;
-        background: aquamarine;
+        padding-left: 1rem;
+        column-gap: 2.5rem;
+        background: #b5b5b5;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 4;
     }
     
     .menu {
@@ -26,9 +33,10 @@ const strutturaPagina = (() => {
         background-size: 100% 100%;
         border: none;
         outline: none;
-        background-color: white;
+        background-color: #ffffff00;
         border-radius: 16px;
         cursor: pointer;
+        filter: brightness(0) invert(1);
     }
     
     .menu-active {
@@ -39,8 +47,10 @@ const strutturaPagina = (() => {
     .titolo {
         display: flex;
         align-items: center;
-        font-size: 1.5rem;
+        font-size: 2.5rem;
         column-gap: 2rem;
+        filter: brightness(0) invert(1);
+        padding: 5px;
     }
     
     .main {
@@ -51,13 +61,26 @@ const strutturaPagina = (() => {
         gap: 2rem;
         font-size: 2rem;
         position: relative;
+        padding-bottom: 20px;
     }
     
     .aggiungiTask {
         display: flex;
-        align-items: center;
-        column-gap: 1rem;
         cursor: pointer;
+        height: 3rem;
+        width: 9rem;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        border-radius: 16px;
+        border: none;
+        font-family: inherit;
+        align-self: center;
+    }
+
+    .aggiungiTask:hover {
+        color: white;
+        background-color: black;
     }
     
     .footer {
@@ -65,7 +88,7 @@ const strutturaPagina = (() => {
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         display: flex;
         gap: 5px;
-        background-color: #DACC3E;
+        background-color: #b5b5b5;
         justify-content: center;
         z-index: 3;
     }
@@ -103,7 +126,7 @@ const strutturaPagina = (() => {
         overflow-y: auto;
         transition: opacity 0.3s ease;
         transform: translate(-50%, -50%);
-        z-index: 3;
+        z-index: 1001;
         padding: 2.4rem;
         display: none;
         flex-direction: column;
@@ -125,7 +148,7 @@ const strutturaPagina = (() => {
         overflow-y: auto;
         transition: opacity 0.3s ease;
         transform: translate(-50%, -50%);
-        z-index: 3;
+        z-index: 1001;
         padding: 1.4rem;
         display: none;
         flex-direction: column;
@@ -162,19 +185,24 @@ const strutturaPagina = (() => {
     }
     
     .modal-container {
-        position: fixed;
-        left: -300px;
-        min-width: 16rem;
+        position: absolute;
+        left: -100%;
+        min-width: 20%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
+        background-color: rgb(247 247 247);
         overflow-y: auto;
         transition: left 0.3s ease;
-        z-index: 2;
+        z-index: 3;
     }
+    @media (max-width: 768px) {
+        .modal-container {
+          width: 100%; /* 100% della larghezza in modalità mobile */
+        }
+      }
     
     .modal-content {
         padding: 20px;
-        color: white;
+        color: #000000;
     }
     
     .modal-content h2 {
@@ -183,7 +211,7 @@ const strutturaPagina = (() => {
     
     .modal-item {
         padding: 10px;
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: #b5b5b56e;
         margin-bottom: 10px;
         cursor: pointer;
         transition: background-color 0.3s ease;
@@ -202,14 +230,18 @@ const strutturaPagina = (() => {
     
      .menu-aperto {
         background-image:url(../src/media/menu-open.svg);
+        background-size: 100% 100%;
+        filter: brightness(0) invert(1);
     }
 
     .pulsanti, .checkbox {
-        width: 30px;
-        height: 30px;
+        width: 35px;
+        height: 35px;
         border-radius: 8px;
         border: none;
+        padding: 0px;
         cursor:pointer;
+        background-color: #ffffff00;
     }
 
     .checkbox {
@@ -218,29 +250,34 @@ const strutturaPagina = (() => {
 
     .inbox {
         background-image:url(../src/media/inbox.svg);
+        background-size: 100% 100%;
     }
 
     .today {
         background-image:url(../src/media/today.svg);
+        background-size: 100% 100%;
     }
 
     .week {
         background-image:url(../src/media/week.svg);
+        background-size: 100% 100%;
     }
 
     .add {
         background-image:url(../src/media/plus-circle.svg);
+        background-size: 100% 100%;
     }
 
     .trash {
         background-image:url(../src/media/delete.svg);
+        background-size: 100% 100%;
     }
 
     .todoBox {
         display: flex;
         width: clamp(280px, 60%, 1000px);
         justify-content: space-between;
-        border: solid black 2px;
+        background-color :#b5b5b538;
         padding: 0.6rem;
         align-items: center;
         border-radius: 16px;
@@ -248,6 +285,11 @@ const strutturaPagina = (() => {
         gap: 1rem;
         font-size: clamp(16px, 5vw, 24px);
         cursor: pointer;
+        letter-spacing: 0px;
+    }
+
+    .todoBox:hover {
+        background-color: rgb(173 173 173 / 14%);
     }
 
     .firstHalf {
@@ -268,7 +310,7 @@ const strutturaPagina = (() => {
         position: absolute;
         left: 60px;
         border: 2px solid black;
-        width: calc(100% - 140px);
+        width: calc(100% - 150px);
         padding-left: 30px;
     }
 
@@ -282,12 +324,36 @@ const strutturaPagina = (() => {
         text-align: center;
         font-size: clamp(16px, 5vw, 24px);
         position: fixed;
-        background-color: aqua;
+        background-color: whitesmoke;
         top: 50%;
         left: 50%;
         overflow-y: auto;
         transition: opacity 0.3s ease;
         transform: translate(-50%, -50%);
+        z-index : 1001;
+    }
+
+    .modal-overlay { /* Crea un velo semi-trasparente */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5); 
+        z-index: 1000; 
+    }
+
+    .nomeProgetto {
+        font-size: 3rem;
+        margin-bottom: 0px;
+    }
+    
+    .firstHalf > span {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: 100px;
+        text-overflow: ellipsis;
     }
 
 
@@ -296,13 +362,13 @@ const strutturaPagina = (() => {
     <nav>
         <button type="menu" class="menu"></button>
         <div class="titolo">
-            <span>Todo-List</span>
+            <span>Todo List</span>
             <img src="../src/media/logo.svg" alt="webpage logo" height="40px" width="40px">
         </div>
     </nav>
 
     <div class="main">
-
+                                                                <div  id="modalOverlay"></div>
         <div id="modalContainer" class="modal-container">
             <div class="modal-content">
                 <div class="modal-item" id='0'>inBox
@@ -328,22 +394,22 @@ const strutturaPagina = (() => {
             <p class="action">Add todo</p>
             <div class="input">
                 <label for="titolo">Titolo:</label>
-                <input type="text" id="titolo" name="titolo" required autocomplete="off">
+                <input type="text" id="titolo" name="titolo"  autocomplete="off">
             </div>
 
             <div class="input">
                 <label for="descrizione">Descrizione:</label>
-                <textarea id="descrizione" name="descrizione" rows="4" cols="50">Fare bla con il blabla. Capitoh?!</textarea>
+                <textarea id="descrizione" name="descrizione" rows="4" cols="50"></textarea>
             </div>
 
             <div class="input">
                 <label for="priorità">Priorità:</label>
-                <input type="number" id="priorità" name="priorità" min="1" max="5" required autocomplete="off">
+                <input type="number" id="priorità" name="priorità" min="1" max="5"  autocomplete="off">
             </div>
 
             <label for="data">Data:</label>
 
-            <input type="date" id="data" name="data-inizio" value="2023-10-09" min="2023-10-09"/>
+            <input type="date" id="data" name="data-inizio"  min=""/>
 
             <div class="input">
                 <button type="submit" id="add">Add</button>
@@ -355,7 +421,7 @@ const strutturaPagina = (() => {
             <p class="action-project">Add Project</p>
             <div class="input">
                 <label for="nome-progetto">Nome:</label>
-                <input type="text" id="nome-progetto" name="nome-progetto" required autocomplete="off">
+                <input type="text" id="nome-progetto" name="nome-progetto"  autocomplete="off">
             </div>
 
             <div class="input">
