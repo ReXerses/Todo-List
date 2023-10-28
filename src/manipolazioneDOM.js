@@ -36,6 +36,7 @@ const caricaPagina = (() => {
     
 
     function inserisciProgettoDOM(submit_progetto, id) {
+        //Il nome del progetto viene passato come stringa tramite submit_progetto. 
         const contenuto_modale = document.querySelector('.modal-content');
         const box = document.createElement('div');
         box.textContent = submit_progetto;
@@ -52,6 +53,7 @@ const caricaPagina = (() => {
           removeAllTodoBoxDom();
           progettoAttuale = 0;
           nomeProgetto.textContent = progetti[0].nome;
+          inboxBox.click();
         })
       
         box.appendChild(eliminaProgettoBtn);
@@ -66,7 +68,7 @@ const caricaPagina = (() => {
             if (progetti[progettoAttuale].todos[0]) {
               caricaTodoDom(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length - 1);
             } else {
-              removeAllTodoBoxDom(); // controllo
+              removeAllTodoBoxDom(); 
             }
           }
 
@@ -74,6 +76,7 @@ const caricaPagina = (() => {
       }
 
     function inserisciTodoDOM (progetto, id) {
+        //L'array di todo è passato tramite 'progetto' che non è altro che progetti[indice].todos.
         const mainContainer = document.querySelector('.main');
         const todoBox = document.createElement('div');
 
@@ -240,38 +243,38 @@ const caricaPagina = (() => {
     })
     inboxBox.click();
 
-    openModalBtn.addEventListener('click', () => {
+    openModalBtn.addEventListener('click', () => { // Per il menù
         openModalBtn.classList.toggle('menu-aperto');
         modalContainer.classList.toggle('modal-open');
     });
 
-    addTask.addEventListener('click', () => {
+    addTask.addEventListener('click', () => { //Per aprire il form dedito alla creazione dei task
         if (addTask.disabled === false ) {
                 overlay.classList.toggle('modal-overlay');
                 modale_addTask.style.display = "flex";
         }
     });
     
-    cancelTaskBtn.addEventListener('click', (e) => {
+    cancelTaskBtn.addEventListener('click', (e) => { //Chiude e resetta il form in caso l'utente scelga di annullare l'operazione
         e.preventDefault();
         overlay.classList.toggle('modal-overlay');
         modale_addTask.reset();
         modale_addTask.style.display = "none";
     })
 
-    addProject.addEventListener('click', () => {
+    addProject.addEventListener('click', () => { //Per aprire il form dedito alla creazione dei progetti
         overlay.classList.toggle('modal-overlay');
         modale_addProject.style.display = "flex";
     })
     
-    cancelProjectBtn.addEventListener('click', (e) => {
+    cancelProjectBtn.addEventListener('click', (e) => { //Chiude e resetta il form in caso l'utente scelga di annullare l'operazione
         e.preventDefault();
         overlay.classList.toggle('modal-overlay');
         modale_addProject.reset();
         modale_addProject.style.display = "none";
     })
 
-    modale_addProject.addEventListener('submit', (e) => {
+    modale_addProject.addEventListener('submit', (e) => { //Chiude, resetta e crea il progetto dopo che l'utente decide di creare un progetto
         e.preventDefault();
         
         const submit_progetto = document.getElementById('nome-progetto').value;
@@ -284,12 +287,12 @@ const caricaPagina = (() => {
             modale_addProject.style.display = "none";
             inserisciProgettoDOM(submit_progetto,progetti.length-1);
         } else {
-            alert('Inserisci un nome al progetto');
+            alert('Please fill in all fields in the form');
         }
 
     })
 
-    modale_addTask.addEventListener('submit' , (e) => {
+    modale_addTask.addEventListener('submit' , (e) => { //Chiude, resetta e crea un todo dopo che l'utente decide di creare il todo
         e.preventDefault();
         const titolo = document.getElementById('titolo').value;
         const descrizione = document.getElementById('descrizione').value;
@@ -305,21 +308,20 @@ const caricaPagina = (() => {
 
             inserisciTodoDOM(progetti[progettoAttuale].todos, progetti[progettoAttuale].todos.length -1);
         } else {
-            alert('Inserire tutti i campi');
+            alert('Please fill in all fields in the form');
         }
 
     })
 
-    oggi.addEventListener('click' , () => {
+    oggi.addEventListener('click' , () => { // Mostra i todo che scadono i data odierna
         addTask.disabled = true;
         removeAllTodoBoxDom();
         nomeProgetto.textContent = oggi.textContent;
         mostraTodoOggiDOM(progetti);
     })
 
-    questaSettimana.addEventListener('click' , () => {
+    questaSettimana.addEventListener('click' , () => { // Mostra i todo che scadono durante la settimana (da lunedi a domenica)
         addTask.disabled = true;
-        console.log(addTask.disabled);
         removeAllTodoBoxDom();
         nomeProgetto.textContent= questaSettimana.textContent;
         mostraTodoQuestaSettimanaDOM(progetti);

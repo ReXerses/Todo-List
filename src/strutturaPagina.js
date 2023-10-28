@@ -110,6 +110,9 @@ const strutturaPagina = (() => {
     textarea {
         resize: none;
         width: 100%;
+        background-color: #00000075;
+        color: white;
+        border-radius: 4px;
     }
     
     .action {
@@ -122,7 +125,7 @@ const strutturaPagina = (() => {
         top: 50%;
         left: 50%;
         max-width: 70%;
-        background-color: rgb(243 185 24 / 80%);
+        background-color: white;
         overflow-y: auto;
         transition: opacity 0.3s ease;
         transform: translate(-50%, -50%);
@@ -144,7 +147,7 @@ const strutturaPagina = (() => {
         top: 50%;
         left: 50%;
         max-width: 70%;
-        background-color: rgb(243 185 24 / 80%);
+        background-color: white;
         overflow-y: auto;
         transition: opacity 0.3s ease;
         transform: translate(-50%, -50%);
@@ -173,15 +176,24 @@ const strutturaPagina = (() => {
     }
     
     .input > button {
-        height: 1.5rem;
-        border-radius: 32px;
-        border: 0;
         margin: 5px;
+        display: flex;
         cursor: pointer;
+        height: 3rem;
+        width: 9rem;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        border-radius: 16px;
+        border: none;
+        font-family: inherit;
+        align-self: center;
     }
     
+    
     .input > button:hover {
-        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        background-color: black;
     }
     
     .modal-container {
@@ -368,7 +380,7 @@ const strutturaPagina = (() => {
     </nav>
 
     <div class="main">
-                                                                <div  id="modalOverlay"></div>
+        <div  id="modalOverlay"></div>
         <div id="modalContainer" class="modal-container">
             <div class="modal-content">
                 <div class="modal-item" id='0'>inBox
@@ -393,21 +405,21 @@ const strutturaPagina = (() => {
         <form class="add-task" action="#" method="get">
             <p class="action">Add todo</p>
             <div class="input">
-                <label for="titolo">Titolo:</label>
+                <label for="titolo">Title:</label>
                 <input type="text" id="titolo" name="titolo"  autocomplete="off">
             </div>
 
             <div class="input">
-                <label for="descrizione">Descrizione:</label>
+                <label for="descrizione">Description:</label>
                 <textarea id="descrizione" name="descrizione" rows="4" cols="50"></textarea>
             </div>
 
             <div class="input">
-                <label for="priorità">Priorità:</label>
+                <label for="priorità">Priority:</label>
                 <input type="number" id="priorità" name="priorità" min="1" max="5"  autocomplete="off">
             </div>
 
-            <label for="data">Data:</label>
+            <label for="data">Date:</label>
 
             <input type="date" id="data" name="data-inizio"  min=""/>
 
@@ -420,7 +432,7 @@ const strutturaPagina = (() => {
         <form class="add-project" action="#" method="get">
             <p class="action-project">Add Project</p>
             <div class="input">
-                <label for="nome-progetto">Nome:</label>
+                <label for="nome-progetto">Name:</label>
                 <input type="text" id="nome-progetto" name="nome-progetto"  autocomplete="off">
             </div>
 

@@ -7,7 +7,7 @@ const storage = (() => {
     function loadDataFromLocalStorage() {
         const progettiSalvati = localStorage.getItem("progetti");
         if (progettiSalvati) {
-            return JSON.parse(progettiSalvati); // Restituisci il valore
+            return JSON.parse(progettiSalvati); 
         }
         return [];
     }
